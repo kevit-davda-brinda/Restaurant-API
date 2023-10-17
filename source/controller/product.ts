@@ -1,38 +1,73 @@
 import { I_Product as Product, ProductModel } from "../model/product";
 
 // Create a new product
-export async function createProduct(productData: Product): Promise<Product> {
+export async function createProduct(productData: Product): Promise<Product | String> {
     try {
         const product = new ProductModel(productData);
+
+        const productCode  = productData.productCode;
+
+        if (productCode) {
+            const product = await ProductModel.findOne( { productCode } );
+
+            if(product){
+                return 'Product already available';
+            }
+        }
+
+        // ProductModel.find({}).populate();
+
         const savedProduct = await product.save();
         return savedProduct;
-      } catch (error) {
+    } catch (error) {
         console.error('Error creating product:', error);
         throw error; // Rethrow the error to handle it at the calling site
-      }
+    }
 }
 
 // Update a product
-export async function updateProduct(productCode: string, updatedData: Partial<Product>): Promise<Product | null> {
-    return await ProductModel.findOneAndUpdate({ productCode }, updatedData, { new: true });
+export async function updateProduct(productCode: string, updatedData: Partial<Product>): Promise<Product | String> {
+    const output = await ProductModel.findOneAndUpdate({ productCode }, updatedData, { new: true });
+
+    if (output == null) {
+        return 'ProductCode is not valid';
+    }
+
+    return output;
 }
 
 // Delete a product by product code
-export async function deleteProduct(productCode: string){
-    try{
-         ProductModel.deleteOne({ productCode }).then((data)=>{
-           return data.deletedCount
-         }).catch(console.error);
-         
+export async function deleteProduct(productCode: string) {
+    try {
+        const findProduct = await ProductModel.find({ productCode })
+
+        if (findProduct.length == 0) {
+            return 'Please provide correct Product Code';
+        }
+
+        await ProductModel.findOneAndDelete(findProduct);
+        return 'Product Deleted Successfully';
     }
-   catch(e){
-    console.log(e)
-   }
+    catch (e) {
+        console.log(e)
+    }
 }
 
 // Delete products by name (soft delete)
-export async function deleteProductsByName(name: string): Promise<void> {
-    await ProductModel.updateMany({ name }, { $set: { isDeleted: true } });
+export async function deleteProductsByName(name: string) {
+    try {
+        const findProduct = await ProductModel.find({ name })
+
+        if (findProduct.length == 0) {
+            return 'Please provide correct Product name';
+        }
+
+        await ProductModel.findOneAndDelete(findProduct);
+        return 'Product Deleted Successfully';
+    }
+    catch (e) {
+        console.log(e)
+    }
 }
 
 // Filter products by created at

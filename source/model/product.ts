@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, model } from 'mongoose';
+import invoice from './invoice';
 
 // Product Schema
 export interface I_Product extends Document{
@@ -6,7 +7,7 @@ export interface I_Product extends Document{
     name: string;
     description: string;
     price: number;
-    createdAt: Date;
+    invoice_id?: Object
     // Add other product details here
   }
   
@@ -15,6 +16,7 @@ export const productSchema = new Schema<I_Product>({
       type : String,
       required : true,
       unique : true,
+      immutable: true 
     },
     name: {
       type : String,
@@ -22,9 +24,18 @@ export const productSchema = new Schema<I_Product>({
     },
     description: String,
     price: Number,
-    createdAt: Date,
+    invoice_id:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Invoice"
+    }
     // Add other product details as needed
-  });
+  },
+  {
+    timestamps: true,
+  }
+);
 
-  export const ProductModel = model<I_Product>('Product' , productSchema);
+
+
+  export const ProductModel = model<I_Product>('Product' , productSchema , "product");
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import { router } from './routers/user';
 import { product_router } from './routers/product';
+import invoice_router from './routers/invoices';
 import './db/mongoConn';
 
 const app : express.Application = express();
@@ -11,6 +12,7 @@ const port : number = 3000;
 app.use(express.json());
 app.use(router);
 app.use(product_router);
+app.use(invoice_router);
 
 // app.get('/',(req,res)=>{
 //     res.send('Welcome!');

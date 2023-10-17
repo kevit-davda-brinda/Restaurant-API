@@ -3,14 +3,7 @@ import { UserModel } from '../model/user';
 import * as bcrypt from 'bcryptjs';
 import { auth } from '../auth/auth';
 
-
-//exporting and creating router
 export const router = Router();
-
-//testing purpose only
-router.get('/', (req: Request, res: Response) => {
-    res.send('Welcome');
-})
 
 // register / creating user
 router.post('/user', async (req: Request, res: Response) => {
@@ -44,23 +37,6 @@ router.post('/user', async (req: Request, res: Response) => {
     }
 })
 
-router.post('/user/:id', auth, async (req: Request, res: Response) => {
-    try {
-        console.log(req.params.id)
-        const findUser = await UserModel.findById({ _id: req.params.id });
-
-        console.log(findUser);
-
-        if (!findUser) {
-            return res.status(404).send('user not found');
-        }
-        res.send(findUser);
-    } catch (e) {
-        return res.status(500).send(e);
-    }
-
-})
-
 //user can login
 router.post('/login', async (req: Request, res: Response) => {
     try {
@@ -90,7 +66,6 @@ router.post('/login', async (req: Request, res: Response) => {
         return res.status(500).send('Internal server error');
     }
 });
-
 
 //user can update the data
 router.patch('/user' , auth , async (req: Request, res: Response) => {

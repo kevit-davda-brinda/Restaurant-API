@@ -40,6 +40,13 @@ const userSchema = new Schema<User>({
     },
 });
 
+//adding virtual schema
+userSchema.virtual('product', {
+    ref: 'Product',
+    localField: '_id',
+    foreignField: 'owner',
+})
+
 //adding password hasing
 userSchema.pre('save',async function (next){
     const user = this;

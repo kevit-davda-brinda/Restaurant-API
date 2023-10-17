@@ -10,6 +10,7 @@ export const auth =  async (req: Request, res: Response, next: NextFunction) => 
     try{
         const token = req.headers.authorization?.split('Bearer ')[1];
 
+
     if (!token) {
         return res.status(401).json({ error: 'Unauthorised' });
     }
@@ -21,9 +22,6 @@ export const auth =  async (req: Request, res: Response, next: NextFunction) => 
     // console.log(decoded);
 
     const user = await UserModel.findOne({_id : decoded._id });
-
-    req.body.user = user;
-
     }
     catch(e){
         res.status(401).send({error : e});
