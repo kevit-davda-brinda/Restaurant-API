@@ -22,6 +22,8 @@ export const auth =  async (req: Request, res: Response, next: NextFunction) => 
     // console.log(decoded);
 
     const user = await UserModel.findOne({_id : decoded._id });
+
+    // req.user = user;
     }
     catch(e){
         res.status(401).send({error : e});

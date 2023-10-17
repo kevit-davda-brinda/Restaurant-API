@@ -12,15 +12,17 @@ class InvoiceController {
             const new_Product : any[]  = []
 
             //find the product exists or not by name and product code
-            products.forEach(async function (product: ProductInfo) {
-                const findProduct = await ProductModel.find({ productCode: product.productCode });
-                console.log(findProduct.length !== 0);
-                if (findProduct.length !== 0) {
-                    return new_Product.push(findProduct);
+            products.forEach(async (product: ProductInfo) =>{
+                const findProduct = await ProductModel.findOne({ productCode: product.productCode });
+                if(findProduct){
+                    findProduct.invoice_id = invoiceId;
+                    // await ProductModel.updateOne();
+                    new_Product.push(findProduct);
                 }
+
+                // console.log(new_Product);
             });
 
-            console.log(new_Product);
 
             //creating invoice object to save the invoice data
             // const newInvoice = new Invoice({ invoiceId, products : new_Product });

@@ -7,7 +7,7 @@ export interface I_Product extends Document{
     name: string;
     description: string;
     price: number;
-    invoice_id?: Object
+    invoice_id : Object
     // Add other product details here
   }
   
@@ -37,5 +37,5 @@ export const productSchema = new Schema<I_Product>({
 
 
 
-  export const ProductModel = model<I_Product>('Product' , productSchema , "product");
+  export const ProductModel = model<I_Product>('Product' , productSchema);
 

@@ -8,6 +8,7 @@ export interface InvoiceDocument extends Document {
 }
 
 export interface ProductInfo {
+  
   productCode: string;
   productName: string;
   createdAt: Date;
@@ -16,11 +17,7 @@ export interface ProductInfo {
 const InvoiceSchema: Schema = new Schema({
   invoiceId: { type: String, required: true },
   products: [
-    {
-      productCode: { type: String, required: true },
-      productName: { type: String, required: true },
-      createdAt: { type: Date, default: Date.now },
-    },
+    {}
   ],
   createdAt: { type: Date, default: Date.now },
   isDeleted: { type: Boolean, default: false },

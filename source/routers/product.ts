@@ -9,6 +9,7 @@ import {
   searchProductsByName,
   listProducts,
 } from '../controller/product';
+import { ProductModel } from '../model/product';
 
 export const product_router = Router();
 
@@ -27,7 +28,7 @@ product_router.post('/product', auth, async (req: Request, res: Response) => {
     }
 
     const product = await createProduct(productData);
-    
+
     res.status(201).json(product);
 
   } catch (error) {
@@ -94,6 +95,10 @@ product_router.get('/product/:name', auth, async (req: Request, res: Response) =
 //listing the product
 product_router.get('/product', auth, async (req: Request, res: Response) => {
   const output = await listProducts();
+
+  const find = await ProductModel.findOne({}).populate('invoice_id');
+
+  console.log(find);
   return res.send({ message: output });
 })
 
