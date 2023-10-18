@@ -1,27 +1,33 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { I_Product } from './product';
 
 export interface InvoiceDocument extends Document {
-  invoiceId: string;
-  products: Array<ProductInfo>;
-  createdAt: Date;
+  products: Array<I_Product>;
   isDeleted: boolean;
 }
 
 export interface ProductInfo {
-  
+  productId: Object;
   productCode: string;
   productName: string;
   createdAt: Date;
 }
 
 const InvoiceSchema: Schema = new Schema({
-  invoiceId: { type: String, required: true },
   products: [
-    {}
+    {
+      type: Object,
+      ref: 'Product'
+    }
   ],
-  createdAt: { type: Date, default: Date.now },
-  isDeleted: { type: Boolean, default: false },
-});
+  isDeleted: {
+    type: Boolean,
+    default: false
+  }
+},
+  {
+    timestamps: true
+  });
 
 
 export default mongoose.model<InvoiceDocument>('Invoice', InvoiceSchema);

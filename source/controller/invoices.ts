@@ -1,70 +1,59 @@
 import { Request, Response } from 'express';
-import Invoice, { ProductInfo } from '../model/invoice';
+import Invoice from '../model/invoice';
 import { I_Product, ProductModel } from '../model/product';
+
 
 class InvoiceController {
 
     async createInvoice(req: Request, res: Response) {
         try {
-            const { invoiceId, products } = req.body;
-            // console.log(req.body);
 
-            const new_Product : any[]  = []
+            const invoice = new Invoice();
 
-            //find the product exists or not by name and product code
-            products.forEach(async (product: ProductInfo) =>{
+            invoice.products = [];
+
+            const savedInvoice = await invoice.save();
+
+            req.body.products.filter(async (product: I_Product) => {
                 const findProduct = await ProductModel.findOne({ productCode: product.productCode });
-                if(findProduct){
-                    findProduct.invoice_id = invoiceId;
-                    // await ProductModel.updateOne();
-                    new_Product.push(findProduct);
-                }
 
-                // console.log(new_Product);
+                if (findProduct) {
+                    await ProductModel.updateOne({ _id: findProduct.id }, { $set: { invoiceId: savedInvoice.id } });
+                    await Invoice.findOneAndUpdate({ _id: savedInvoice.id }, { $push: { products: findProduct.id } }, { new: true });
+                }
             });
 
-
-            //creating invoice object to save the invoice data
-            // const newInvoice = new Invoice({ invoiceId, products : new_Product });
-
-            // await newInvoice.save();
-
-            return res.status(201).json({ message: 'Invoice created successfully' });
+            res.status(201).json(savedInvoice);
         } catch (error) {
-            return res.status(500).json({ message: 'Error creating invoice' });
+            res.status(500).json({ error });
         }
     }
+
 
     async editInvoice(req: Request, res: Response) {
-        try {
-            const { invoiceId, ...updates } = req.body;
-            const existingInvoice = await Invoice.findOne({ invoiceId });
 
-            if (!existingInvoice) {
-                return res.status(404).json({ message: 'Invoice not found' });
+        const findInvoice = await Invoice.findById(req.params.id).populate('products', ['productCode', 'name', 'createdAt']);
+
+        req.body.products.filter(async (product: I_Product) => {
+            const findProduct = await ProductModel.findOne({ productCode: product.productCode });
+
+            if (findProduct) {
+                await ProductModel.updateOne({ _id: findProduct.id }, { $set: { invoiceId: findInvoice?.id } });
+                await Invoice.findOneAndUpdate({ _id: findInvoice?.id }, { $push: { products: findProduct.id } }, { new: true });
             }
+        });
 
-            //finding the product that wants to update
-            const index = existingInvoice.products.findIndex((product) => product.productCode === updates.productCode);
-
-            if (index === -1) {
-                return res.send('Provide correct Product Code');
-            }
-
-            existingInvoice.products[index] = updates;
-
-            //saving it
-            await existingInvoice.updateOne();
-
-            return res.status(200).json({ message: 'Invoice updated successfully' });
-        } catch (error) {
-            return res.status(500).json({ message: 'Error editing invoice' });
-        }
+        res.send(findInvoice);
     }
+
+    // deleting invoices
     async deleteInvoice(req: Request, res: Response) {
         try {
             const { invoiceId } = req.params;
-            const deletedInvoice = await Invoice.findOneAndUpdate({ invoiceId }, { isDeleted: true }, { new: true });
+
+            const deletedInvoice = await Invoice.findByIdAndUpdate(invoiceId, { isDeleted: true }, { new: true });
+
+            console.log(deletedInvoice);
             if (!deletedInvoice) {
                 return res.status(404).json({ message: 'Invoice not found' });
             }
@@ -73,18 +62,27 @@ class InvoiceController {
             return res.status(500).json({ message: 'Error deleting invoice' });
         }
     }
+
+    // listing invoices
     async viewInvoice(req: Request, res: Response) {
-        try {
-            const { invoiceId } = req.params;
-            const invoice = await Invoice.findOne({ invoiceId });
-            if (!invoice) {
-                return res.status(404).json({ message: 'Invoice not found' });
-            }
-            return res.status(200).json(invoice);
-        } catch (error) {
-            return res.status(500).json({ message: 'Error viewing invoice' });
-        }
+        const findData = await Invoice.find({}).sort({ createdAt: -1 }).populate('products', ['productCode', 'name', 'createdAt']).exec();
+
+        res.send(findData);
     }
-    // Implement other invoice management methods as needed
+
+    // listing invoices
+    async viewProductByInvoices(req: Request, res: Response) {
+        const findData = await Invoice.findById(req.params.invoiceId).populate('products', [ 'name']);
+
+        res.send(findData?.products);
+    }
+
+    //view invoices for invoice id and createdAt
+    async viewInvoiceonlyCreatedAtandID(req: Request, res: Response) {
+        const findData = await Invoice.find({} , { '_id' : 1, 'createdAt' : 1});
+
+        res.send(findData);
+    }
+
 }
 export default InvoiceController;

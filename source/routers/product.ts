@@ -96,7 +96,7 @@ product_router.get('/product/:name', auth, async (req: Request, res: Response) =
 product_router.get('/product', auth, async (req: Request, res: Response) => {
   const output = await listProducts();
 
-  const find = await ProductModel.findOne({}).populate('invoice_id');
+  const find = await ProductModel.findOne({});
 
   console.log(find);
   return res.send({ message: output });

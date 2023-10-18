@@ -7,7 +7,7 @@ export interface I_Product extends Document{
     name: string;
     description: string;
     price: number;
-    invoice_id : Object
+    invoiceId?: Object;
     // Add other product details here
   }
   
@@ -24,10 +24,10 @@ export const productSchema = new Schema<I_Product>({
     },
     description: String,
     price: Number,
-    invoice_id:{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Invoice"
-    }
+    invoiceId: {
+      type : Object,
+      ref : 'Invoice'
+    },
     // Add other product details as needed
   },
   {

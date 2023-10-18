@@ -6,9 +6,11 @@ const router = express.Router();
 
 const invoiceController = new InvoiceController();
 
-router.post('/create' , auth ,  invoiceController.createInvoice);
-router.patch('/edit', invoiceController.editInvoice);
-router.delete('/delete/:invoiceId', invoiceController.deleteInvoice);
-router.get('/view/:invoiceId', invoiceController.viewInvoice);
+router.post('/invoice' , auth ,  invoiceController.createInvoice);
+router.patch('/invoice/:id', invoiceController.editInvoice);
+router.delete('/invoice/:invoiceId', invoiceController.deleteInvoice);
+router.get('/invoice/:invoiceId', invoiceController.viewProductByInvoices);
+router.get('/invoices', invoiceController.viewInvoice);
+router.get('/invoice', invoiceController.viewInvoiceonlyCreatedAtandID);
 
 export default router;
